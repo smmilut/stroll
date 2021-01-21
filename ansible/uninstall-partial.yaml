@@ -1,0 +1,22 @@
+---
+- hosts: vm_raspi_dev
+  become: yes
+  tasks:
+  - name: Disable and stop service
+    ansible.builtin.systemd:
+      state: stopped
+      enabled: no
+      name: stroll
+  - name: Remove systemd unit file
+    ansible.builtin.file:
+      path: /lib/systemd/system/stroll.service
+      state: absent
+  - name: Remove program symlink
+    ansible.builtin.file:
+      path: /usr/local/bin/stroll
+      state: absent
+  - name: Recursively remove program files directory
+    ansible.builtin.file:
+      path: /usr/local/lib/stroll
+      state: absent
+...

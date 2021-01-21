@@ -1,0 +1,12 @@
+[Unit]
+Description=stroll sensor polling service
+After=network.target
+
+[Service]
+Type=exec
+ExecStart=/usr/local/bin/stroll
+ExecReload=/bin/kill -HUP $MAINPID
+User=abdomino
+
+[Install]
+WantedBy=multi-user.target

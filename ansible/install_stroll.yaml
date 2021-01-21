@@ -1,0 +1,40 @@
+---
+- hosts: raspi
+  become: yes
+  tasks:
+  - name: Add system user abdomino
+    user:
+      name: abdomino
+      shell: /usr/sbin/nologin
+      groups: gpio
+      system: yes
+  - name: Send the program files with owner and permission
+    copy:
+      src: ../lib/stroll
+      dest: /usr/local/lib/
+      owner: root
+      group: root
+      mode: u=rw,g=r,o=r
+  - name: Install specified python requirements in indicated (virtualenv)
+    pip:
+      virtualenv_command: /usr/bin/python3 -m venv
+      requirements: /usr/local/lib/stroll/requirements.txt
+      virtualenv: /usr/local/lib/stroll/virtualenv
+  - name: Symlink script to bin
+    file:
+      src: /usr/local/lib/stroll/stroll.py
+      dest: /usr/local/bin/stroll
+      mode: u=rwx,g=rx,o=rx
+      state: link
+  - name: Send systemd unit file
+    copy:
+      src: ../systemd/stroll.service
+      dest: /lib/systemd/system/stroll.service
+      owner: root
+      group: root
+      mode: u=rw,g=r,o=r
+  - name: Make sure a service is running
+    ansible.builtin.systemd:
+      state: started
+      name: stroll
+...
